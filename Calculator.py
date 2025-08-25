@@ -20,3 +20,4 @@ def board(b):
     {b[6]} I {b[7]} I {b[8]}
     '''
 print(board(b))
+print("h")
