@@ -1,23 +1,80 @@
-import random
-b=[" "]*9
-print(b)
-computer="0"
-user ="x"
+class SimpleCalculator:
+    def __init__(self, expression):
+        self.expr = expression.replace(" ", "")   
 
-    
-n= int(input("enter cell no : "))
-n1=random.randint(0,8)
-b[n1]=computer
+    def solve(self):
+        # Step 1: Brackets first
+        while "(" in self.expr:
+            close = self.expr.find(")")
+            open = self.expr.rfind("(", 0, close)
+            inside = self.expr[open+1:close]
 
-print(b)
-b[n]=user
-print(b)
+            # solve inside bracket
+            result = SimpleCalculator(inside).solve()
+            self.expr = self.expr[:open] + str(result) + self.expr[close+1:]
 
-def board(b):
-    return f'''
-    {b[0]} I {b[1]} I {b[2]}
-    {b[3]} I {b[4]} I {b[5]}
-    {b[6]} I {b[7]} I {b[8]}
-    '''
-print(board(b))
-print("h")
+        # Step 2: Solve * and /
+        self.expr = self._solve_mul_div(self.expr)
+
+        # Step 3: Solve + and -
+        self.expr = self._solve_add_sub(self.expr)
+
+        return int(self.expr)
+
+    def _solve_mul_div(self, exp):
+        i = 0
+        while i < len(exp):
+            if exp[i] in "*/":
+                left, li = self._get_left_number(exp, i-1)
+                right, ri = self._get_right_number(exp, i+1)
+
+                if exp[i] == "*":
+                    res = left * right
+                else:
+                    res = left // right  
+
+                exp = exp[:li] + str(res) + exp[ri:]
+                i = 0   
+            else:
+                i += 1
+        return exp
+
+    def _solve_add_sub(self, exp):
+        i = 1   
+        while i < len(exp):
+            if exp[i] in "+-":
+                left, li = self._get_left_number(exp, i-1)
+                right, ri = self._get_right_number(exp, i+1)
+
+                if exp[i] == "+":
+                    res = left + right
+                else:
+                    res = left - right
+
+                exp = exp[:li] + str(res) + exp[ri:]
+                i = 0
+            else:
+                i += 1
+        return exp
+
+    def _get_left_number(self, exp, i):
+        num = ""
+        while i >= 0 and exp[i].isdigit():
+            num = exp[i] + num
+            i -= 1
+        return int(num), i+1
+
+    def _get_right_number(self, exp, i):
+        num = ""
+        while i < len(exp) and exp[i].isdigit():
+            num += exp[i]
+            i += 1
+        return int(num), i
+
+
+
+# Example usage
+expr = "(8 - 2)*3 +6/2"
+calc = SimpleCalculator(expr)
+print(f"{expr} = {calc.solve()}")
+
