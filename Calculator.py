@@ -3,20 +3,19 @@ class SimpleCalculator:
         self.expr = expression.replace(" ", "")   
 
     def solve(self):
-        # Step 1: Brackets first
+       
         while "(" in self.expr:
             close = self.expr.find(")")
             open = self.expr.rfind("(", 0, close)
             inside = self.expr[open+1:close]
 
-            # solve inside bracket
+           
             result = SimpleCalculator(inside).solve()
             self.expr = self.expr[:open] + str(result) + self.expr[close+1:]
 
-        # Step 2: Solve * and /
         self.expr = self._solve_mul_div(self.expr)
 
-        # Step 3: Solve + and -
+     
         self.expr = self._solve_add_sub(self.expr)
 
         return int(self.expr)
@@ -73,7 +72,7 @@ class SimpleCalculator:
 
 
 
-# Example usage
+
 expr = "(8 - 2)*3 +6/2"
 calc = SimpleCalculator(expr)
 print(f"{expr} = {calc.solve()}")
